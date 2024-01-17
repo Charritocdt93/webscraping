@@ -5,6 +5,8 @@ from src.Models.Team import Team
 
 from datetime import datetime
 
+from src.Services.file_services import save_clasification_file
+
 
 def SelectWebScraping(opc):
     # Ciclo principal del menú
@@ -13,7 +15,7 @@ def SelectWebScraping(opc):
             if opc == 1:
                 year = int(input("Introduzca una año: "))
                 url = f"https://es.besoccer.com/competicion/clasificacion/primera/{year}"
-                Clasificacion(url)
+                Clasificacion(url,year)
             elif opc == 2:
                 date = input("Introduzca una fecha (formato: YYYY-MM-DD): ")
                 try:
@@ -25,11 +27,11 @@ def SelectWebScraping(opc):
             elif opc == 3:
                 year = int(input("Seleccione una año: "))
                 url = f"https://es.besoccer.com/competicion/clasificacion/primera/{year}"
-                Clasificacion(url)
+                Clasificacion(url,year)
             elif opc == 4:
                 year = int(input("Seleccione una año: "))
                 url = f"https://es.besoccer.com/competicion/clasificacion/primera/{year}"
-                Clasificacion(url)
+                Clasificacion(url, year)
             elif opc == 5:
                 print("Saliendo del programa. ¡Hasta luego!")
         except:
@@ -38,7 +40,8 @@ def SelectWebScraping(opc):
     except Exception as e:
         print(f"Se produjo un error inesperado: {e}")
 
-def Clasificacion(url):
+
+def Clasificacion(url, year):
     try:
         # Realizar una solicitud HTTP para obtener el contenido de la página web
         response = requests.get(url)
@@ -67,17 +70,11 @@ def Clasificacion(url):
                         equipo = Team(nombre_equipo, 1, puntos_equipo)
                         equipos.append(equipo)
 
-                        try:
-                            with open('../data/noticias_' + categoria_scraping + '.csv', 'a') as f:
-                                f.write(titulo + ',' + url_noticia + ',' + categoria + ',' + str(
-                                    fecha) + '\n')
-                            # Analizar el contenido con BeautifulSoup
-                        except:
-                            print("ERROR: no se pudo anexar la noticia al archivo noticias.csv")
-
                     # Imprimir los datos de los objetos Team
                     for i, equipo in enumerate(equipos, 1):
                         print(f"{i} - {equipo.nombre}, Puntos: {equipo.puntos}")
+
+                    save_clasification_file(equipos, year)
 
                 else:
                     print(
@@ -95,7 +92,6 @@ def Clasificacion(url):
 
     except Exception as e:
         print("Error durante el web scraping:", e)
-
 
 # def Match_dates(url):
 #     try:
